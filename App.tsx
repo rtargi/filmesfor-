@@ -2,6 +2,7 @@ import React from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Dossiers from './components/Dossiers';
+import AISection from './components/AISection';
 import Actions from './components/Actions';
 import Footer from './components/Footer';
 import type { Dossier } from './types';
@@ -36,6 +37,7 @@ const App: React.FC = () => {
       <main>
         <Hero />
         <Dossiers dossiers={dossiersData} />
+        <AISection />
         <Actions />
       </main>
       <Footer />

@@ -2,7 +2,7 @@ import React from 'react';
 
 const Actions: React.FC = () => {
   return (
-    <section className="bg-surface text-center py-24 sm:py-32">
+    <section id="actions" className="bg-surface text-center py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-5">
          <div className="max-w-2xl mx-auto">
             <h2 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl font-display">Faça parte da mudança</h2>
