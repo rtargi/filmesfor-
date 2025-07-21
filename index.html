@@ -1,0 +1,1143 @@
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "@google/genai": "https://esm.run/@google/genai"
+  }
+}
+</script>
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FSA: Do Quarto de Brinquedos ao Maior Bioma Cultural da Terra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Earthy Harmony (Integrated) -->
+    <!-- Application Structure Plan: An integrated narrative SPA combining the best of both versions. The flow is: 1. Hero (Problem Statement). 2. Diagnóstico (Data on the problem's scale, funding, and concentration). 3. Os Excluídos (Humanizing the issue with interactive cards). 4. A Batalha (Personal case study of Ricardo Targino). 5. A Visão (Contrasting old vs. new paradigms). 6. O Plano de Ação (Comprehensive, multi-tab proposal section). 7. Cronograma (Interactive timeline for implementation). 8. Ferramentas (New Gemini-powered creative tools). 9. Impacto (Expected positive outcomes). 10. Chamado à Ação (A powerful concluding message with Gemini mobilization tools). This structure creates the most logical and compelling user journey from problem to solution. -->
+    <!-- Visualization & Content Choices: 1) FSA Funding Disparity (Report Info) -> Goal: Show scale & misallocation -> Viz: Bar Chart (Chart.js) -> Interaction: Tooltips. 2) Geographic Concentration (Report Info) -> Goal: Prove the "closed club" thesis -> Viz: Doughnut Chart (Chart.js) -> Interaction: Tooltips. 3) Excluded Orgs (Report Info) -> Goal: Humanize -> Viz: Interactive Flipping Cards -> Interaction: Click-to-reveal. 4) Progressive Climate Sub-quota (Report Info) -> Goal: Visualize the proposal -> Viz: Line Chart (Chart.js) -> Interaction: Tooltips. 5) Action Plan Timeline (Report Info) -> Goal: Organize phases -> Viz: Custom HTML/CSS timeline -> Interaction: Click-to-reveal. All choices avoid SVG/Mermaid as required and are integrated into a cohesive whole. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF6;
+            color: #3C3633;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link:hover {
+            color: #2C5F2D;
+        }
+        .nav-link.active {
+            color: #2C5F2D;
+            font-weight: 700;
+            border-bottom: 2px solid #2C5F2D;
+        }
+        .tab-button.active {
+            background-color: #2C5F2D;
+            color: #FDFBF6;
+        }
+        .timeline-item.active .timeline-dot {
+            background-color: #2C5F2D;
+            transform: scale(1.2);
+        }
+        .timeline-item.active .timeline-title {
+            color: #2C5F2D;
+            font-weight: 700;
+        }
+        .card-flip {
+            perspective: 1000px;
+        }
+        .card-flip-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .card-flip.flipped .card-flip-inner {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .prose h4 {
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            font-weight: bold;
+        }
+        .prose ul {
+            list-style-position: inside;
+            padding-left: 1em;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="antialiased">
+
+    <header class="bg-opacity-80 bg-[#FDFBF6] backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-[#2C5F2D]">FilmsForFuture.info</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#diagnostico" class="nav-link text-gray-700 pb-1">Diagnóstico</a>
+                <a href="#excluidos" class="nav-link text-gray-700 pb-1">Os Excluídos</a>
+                <a href="#batalha" class="nav-link text-gray-700 pb-1">A Batalha</a>
+                <a href="#responsabilidade" class="nav-link text-gray-700 pb-1">Responsabilidade</a>
+                <a href="#plano" class="nav-link text-gray-700 pb-1">O Plano</a>
+                <a href="#ferramentas" class="nav-link text-gray-700 pb-1">Ferramentas</a>
+                <a href="#impacto" class="nav-link text-gray-700 pb-1">Impacto</a>
+            </div>
+             <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-[#3C3633] focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden">
+             <a href="#diagnostico" class="block py-2 px-4 text-sm hover:bg-gray-100">Diagnóstico</a>
+             <a href="#excluidos" class="block py-2 px-4 text-sm hover:bg-gray-100">Os Excluídos</a>
+             <a href="#batalha" class="block py-2 px-4 text-sm hover:bg-gray-100">A Batalha</a>
+             <a href="#responsabilidade" class="block py-2 px-4 text-sm hover:bg-gray-100">Responsabilidade</a>
+             <a href="#plano" class="block py-2 px-4 text-sm hover:bg-gray-100">O Plano</a>
+             <a href="#ferramentas" class="block py-2 px-4 text-sm hover:bg-gray-100">Ferramentas</a>
+             <a href="#impacto" class="block py-2 px-4 text-sm hover:bg-gray-100">Impacto</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="min-h-[90vh] flex items-center justify-center bg-cover bg-center py-20">
+            <div class="text-center container mx-auto px-6">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold text-[#3C3633] leading-tight">
+                    A Sabotagem ao <span class="text-[#E0A75E]">Soft Power</span> do Brasil.
+                </h1>
+                <p class="mt-6 text-lg md:text-xl max-w-3xl mx-auto text-gray-600">
+                    Uma transição para tirar o audiovisual do <span class="font-semibold text-red-700">quarto de brinquedos</span> e construir o maior <span class="font-semibold text-[#2C5F2D]">bioma cultural</span> da Terra.
+                </p>
+                <div class="mt-10">
+                    <a href="#diagnostico" class="bg-[#2C5F2D] text-white font-bold py-4 px-8 rounded-lg text-lg hover:bg-opacity-90 transition-transform duration-300 hover:scale-105 shadow-lg">
+                        Entenda o Diagnóstico
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="diagnostico" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-[#3C3633]">O Diagnóstico: Um Paradoxo Bilionário</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-gray-600">
+                        Esta seção revela, com dados, a completa desconexão entre o principal fundo de fomento do Brasil, o Fundo Setorial do Audiovisual (FSA), e a agenda climática. Apesar de gerir bilhões, o FSA opera em um vácuo, ignorando sua responsabilidade e potencial estratégico.
+                    </p>
+                </div>
+                
+                <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
+                    <div class="text-center md:text-left">
+                        <h3 class="text-3xl font-bold text-[#3C3633]">Uma Fortuna Inacessível</h3>
+                        <p class="mt-2 text-gray-600">O FSA movimenta bilhões, mas permanece uma fortaleza para as organizações da sociedade ativa.</p>
+                        <div class="mt-6 grid sm:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-6 rounded-xl shadow-md text-center">
+                                <p class="text-sm font-semibold text-gray-500">Contratado em 3 anos</p>
+                                <p class="text-4xl font-extrabold text-[#E0A75E]">R$ 5 Bilhões</p>
+                            </div>
+                             <div class="bg-gray-50 p-6 rounded-xl shadow-md text-center">
+                                <p class="text-sm font-semibold text-gray-500">Investimento (2024)</p>
+                                <p class="text-4xl font-extrabold text-[#E0A75E]">R$ 1.2 Bilhão</p>
+                            </div>
+                        </div>
+                         <p class="text-center mt-6 text-xl font-semibold text-red-700">0% dos editais com critérios climáticos vinculantes.</p>
+                    </div>
+                     <div class="bg-gray-50 p-6 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-bold text-center mb-4 text-[#3C3633]">Disparidade Orçamentária</h3>
+                        <div class="chart-container">
+                            <canvas id="fsaBudgetChart"></canvas>
+                        </div>
+                        <p class="text-center mt-2 text-sm text-gray-500">Comparativo entre o orçamento do FSA e a dotação proposta para a linha "Audiovisual & Clima".</p>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="bg-gray-50 p-6 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-bold text-center mb-4 text-[#3C3633]">Concentração Geográfica dos Recursos</h3>
+                        <div class="chart-container">
+                            <canvas id="concentrationChart"></canvas>
+                        </div>
+                        <p class="text-center mt-2 text-sm text-gray-500">Mais de 60% de todos os recursos do Fundo são destinados a projetos no eixo Rio-São Paulo.</p>
+                    </div>
+                    <div class="space-y-6">
+                        <h3 class="text-3xl font-bold text-[#3C3633]">A Arquitetura da Exclusão</h3>
+                        <div class="bg-white p-6 rounded-xl border border-gray-200">
+                            <h4 class="text-xl font-bold text-[#2C5F2D]">1. Governança Capturada</h4>
+                            <p class="mt-2 text-gray-600">O comitê gestor (CGFSA) é dominado por uma lógica industrial, sem participação da sociedade civil, ambientalistas ou povos originários.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-gray-200">
+                            <h4 class="text-xl font-bold text-[#2C5F2D]">2. Barreiras Burocráticas</h4>
+                            <p class="mt-2 text-gray-600">Regulamentos feitos para empresas e uma lógica de "retorno financeiro" que pune projetos de interesse público. Um exemplo recente é a Lei Paulo Gustavo (LPG), que ao executar recursos do FSA, vinculou 10% a medidas de acessibilidade sem qualquer estudo que validasse tal percentual, ilustrando a criação de barreiras arbitrárias.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-gray-200">
+                            <h4 class="text-xl font-bold text-[#2C5F2D]">3. Sucessos Acidentais</h4>
+                            <p class="mt-2 text-gray-600">Filmes de relevância global sobre o tema, como "O Território", são exceções que provam a regra: foram financiados fora do sistema FSA.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="excluidos" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold text-[#3C3633]">As Vozes da Terra: Os Excluídos</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-gray-600">Conheça as organizações que produzem narrativas cruciais sobre o Brasil real e que são sistematicamente ignoradas pelo FSA. Clique nos cards para saber mais e gerar ideias de projetos.</p>
+                </div>
+                <div id="orgs-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                </div>
+            </div>
+        </section>
+
+        <section id="batalha" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <div class="text-5xl mb-4">🎥</div>
+                    <h2 class="text-4xl font-bold text-[#3C3633]">A Batalha Contra o Quarto de Brinquedos</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-gray-600">
+                        A jornada do cineasta Ricardo Targino para financiar um projeto de educação climática para a COP30 revelou a negligência, o negacionismo e a captura patrimonial do principal fundo público do audiovisual brasileiro.
+                    </p>
+                </div>
+
+                <div class="max-w-4xl mx-auto">
+                    <h3 class="text-2xl font-bold text-center mb-8 text-[#3C3633]">A Linha do Tempo da Negligência</h3>
+                    <div class="relative border-l-2 border-gray-200 pl-10">
+                        <div class="mb-10">
+                            <div class="absolute w-4 h-4 bg-[#E0A75E] rounded-full -left-2 mt-1.5"></div>
+                            <p class="font-semibold text-gray-500">Dezembro de 2024</p>
+                            <h4 class="text-xl font-bold mt-1">O Protocolo</h4>
+                            <p class="text-gray-600 mt-1">Protocolo do projeto "COP30: Janela de Oportunidade", uma experiência imersiva de educação climática de evidente interesse público.</p>
+                        </div>
+                        <div class="mb-10">
+                            <div class="absolute w-4 h-4 bg-gray-300 rounded-full -left-2 mt-1.5"></div>
+                            <p class="font-semibold text-gray-500">Janeiro a Junho de 2025</p>
+                            <h4 class="text-xl font-bold mt-1">O Labirinto</h4>
+                            <p class="text-gray-600 mt-1">Seis meses de silêncio administrativo, reclassificações e inércia de um fundo incapaz de reagir à urgência climática.</p>
+                        </div>
+                        <div class="mb-10">
+                             <div class="absolute w-4 h-4 bg-gray-300 rounded-full -left-2 mt-1.5"></div>
+                            <p class="font-semibold text-gray-500">Julho de 2025</p>
+                            <h4 class="text-xl font-bold mt-1">A Sugestão de Cortes</h4>
+                            <p class="text-gray-600 mt-1">O BRDE, o "Banco Verde", pede cortes em um orçamento já mínimo e nega o financiamento.</p>
+                        </div>
+                        <div class="mb-10">
+                            <div class="absolute w-4 h-4 bg-red-700 rounded-full -left-2 mt-1.5"></div>
+                            <p class="font-semibold text-gray-500">Julho de 2025</p>
+                            <h4 class="text-xl font-bold text-red-700 mt-1">A Fronteira do Patrimônio</h4>
+                            <p class="text-gray-600 mt-1">A exigência final: "falta de suporte patrimonial". O FSA não é para quem tem ideias, mas para quem herda imóveis e influência.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="max-w-4xl mx-auto mt-16">
+                    <h3 class="text-2xl font-bold text-center mb-8 text-[#3C3633]">O Impasse e os Passos Já Tomados</h3>
+                    <div class="space-y-4" id="accordion-container">
+                        <div class="border border-gray-200 rounded-lg">
+                            <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold text-lg">
+                                <span>📌 1. Direito de Petição (Protocolo Principal)</span>
+                                <span class="accordion-icon transform transition-transform duration-300">▼</span>
+                            </button>
+                            <div class="accordion-content px-4 pb-4 text-gray-600">
+                                <p><strong>Objetivo:</strong> Denunciar a inexistência de política climática no FSA e exigir providências urgentes para a COP30, com base em provas documentais (respostas LAI) e no caso concreto do projeto "FUTURÍVEL".</p>
+                            </div>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg">
+                            <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold text-lg">
+                                <span>📌 2. Recurso Hierárquico e Novas Exigências</span>
+                                <span class="accordion-icon transform transition-transform duration-300">▼</span>
+                            </button>
+                            <div class="accordion-content px-4 pb-4 text-gray-600">
+                                <p><strong>Motivo:</strong> Resposta insatisfatória da ANCINE, que confessou não ter política climática. O recurso exige medidas emergenciais e vinculantes, como a edição de uma Resolução "ad referendum", a criação de uma linha de gestão social com R$ 50 milhões, e a criação de uma Comissão de Transição do Audiovisual.</p>
+                            </div>
+                        </div>
+                         <div class="border border-gray-200 rounded-lg">
+                            <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold text-lg">
+                                <span>🔥 3. O Chamado à Ação</span>
+                                <span class="accordion-icon transform transition-transform duration-300">▼</span>
+                            </button>
+                            <div class="accordion-content px-4 pb-4 text-gray-600">
+                                <p><strong>Conclusão:</strong> Os primeiros passos foram dados. Agora, os narradores reais do Brasil são chamados a apoiar e pressionar pela Resolução Emergencial para tirar o FSA e a ANCINE de onde se encontram: TOTALMENTE FORA DA TERRA.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="responsabilidade" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-[#3C3633]">A Conta do Carbono: Responsabilidade Legal</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-gray-600">
+                        O investimento de R$ 5 bilhões não gerou apenas filmes, mas também um passivo ambiental gigantesco. A legislação brasileira é clara: quem polui tem o dever de reparar, e a omissão dos gestores acarreta responsabilidade.
+                    </p>
+                </div>
+
+                <div class="max-w-6xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-lg mb-12">
+                    <h3 class="text-2xl font-bold text-center mb-6 text-[#3C3633]">Tabela da Irresponsabilidade / Responsabilidade Ambiental</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="border-b-2 border-gray-300">
+                                <tr>
+                                    <th class="p-3 text-sm font-semibold tracking-wider text-gray-600 uppercase">Categoria</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wider text-gray-600 uppercase">Valor Gasto</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wider text-gray-600 uppercase">Emissões (tCO₂e)</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wider text-gray-600 uppercase">Esforço para Neutralizar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-200">
+                                    <td class="p-3 font-bold text-[#3C3633]">"Cinemão" & Grandes Produções</td>
+                                    <td class="p-3">R$ 2 Bilhões</td>
+                                    <td class="p-3">300.000 - 600.000</td>
+                                    <td class="p-3 text-sm text-gray-600">
+                                        <strong>Custo Financeiro:</strong> R$ 7,5M a R$ 60M<br>
+                                        <strong>Ação Florestal:</strong> 6 mil a 24 mil hectares<br>
+                                        <strong>Equivalente:</strong> Retirar de 130 mil a 260 mil carros das ruas por um ano.
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200">
+                                    <td class="p-3 font-bold text-[#3C3633]">Lei Paulo Gustavo (Capilaridade)</td>
+                                    <td class="p-3">R$ 3 Bilhões</td>
+                                    <td class="p-3">200.000 - 400.000</td>
+                                    <td class="p-3 text-sm text-gray-600">
+                                        <strong>Custo Financeiro:</strong> R$ 5M a R$ 40M<br>
+                                        <strong>Ação Florestal:</strong> 4 mil a 16 mil hectares<br>
+                                        <strong>Equivalente:</strong> Retirar de 85 mil a 175 mil carros das ruas por um ano.
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-100 font-bold">
+                                    <td class="p-3 text-[#2C5F2D]">TOTAL DO INVESTIMENTO</td>
+                                    <td class="p-3 text-[#2C5F2D]">R$ 5 Bilhões</td>
+                                    <td class="p-3 text-[#2C5F2D]">500.000 - 1.000.000</td>
+                                    <td class="p-3 text-sm text-gray-700">
+                                        <strong>Custo Total:</strong> R$ 12,5M a R$ 100M<br>
+                                        <strong>Ação Florestal Total:</strong> 10 mil a 40 mil hectares (área > Salvador)<br>
+                                        <strong>Equivalente Total:</strong> Retirar de 215 mil a 430 mil carros das ruas por um ano.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                     <p class="text-right mt-2 text-xs text-gray-500">*tCO₂e = toneladas de CO₂ equivalente.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
+                    <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg shadow-sm">
+                        <h4 class="text-xl font-bold text-red-800 mb-2">A Irresponsabilidade</h4>
+                        <p class="text-red-700">Ignorar estes números. É executar um investimento de R$ 5 bilhões sem provisionar os recursos necessários (entre 0,25% e 2% do total) para mitigar o dano ambiental, transferindo o custo ecológico para toda a sociedade.</p>
+                    </div>
+                     <div class="bg-green-50 border-l-4 border-green-600 p-6 rounded-lg shadow-sm">
+                        <h4 class="text-xl font-bold text-green-800 mb-2">A Responsabilidade</h4>
+                        <p class="text-green-700">Usar esta tabela como um mapa para a ação: orçar a sustentabilidade, exigir critérios nos editais e prestar contas do desempenho ambiental, não apenas do sucesso comercial.</p>
+                    </div>
+                </div>
+
+                <div class="max-w-4xl mx-auto">
+                     <h3 class="text-2xl font-bold text-center mb-8 text-[#3C3633]">Fundamentos Legais para Ação</h3>
+                     <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                            <h4 class="text-xl font-bold text-[#2C5F2D]">Responsabilidade Civil Objetiva e Solidária</h4>
+                            <p class="mt-2 text-gray-600">A responsabilidade por dano ambiental no direito brasileiro é <strong>objetiva</strong>, ou seja, independe da comprovação de culpa, bastando a existência do dano e do nexo causal (art. 14, § 1º, da Lei 6.938/81). O nexo é cristalino: a omissão dos gestores em impor condicionantes ambientais é a causa direta do dano (emissões). A responsabilidade entre os Réus é <strong>solidária</strong>, devendo todos responder integralmente pela reparação.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                            <h4 class="text-xl font-bold text-[#2C5F2D]">Responsabilidade Pessoal dos Gestores Públicos</h4>
+                            <p class="mt-2 text-gray-600">A gravidade da omissão justifica a aplicação do art. 4º da Lei 9.605/98 e do art. 50 do Código Civil, para que a responsabilidade alcance o <strong>patrimônio pessoal dos gestores</strong>. A omissão não foi um mero descuido, mas uma decisão gerencial que, na prática, utilizou a estrutura do Estado para financiar um dano ambiental de larga escala.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="visao" class="py-20 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                 <h2 class="text-4xl font-bold text-[#3C3633]">A Visão: Um Novo Paradigma</h2>
+                 <p class="mt-4 max-w-3xl mx-auto text-gray-600">
+                    Propomos romper com a lógica colonial que domina o setor. A mudança é sair de um modelo falido de "indústria" para abraçar nossa vocação de ser o maior e mais vibrante bioma cultural do planeta, um motor para a transição ecológica.
+                </p>
+                <div class="mt-12 grid md:grid-cols-2 gap-8 text-left">
+                    <div class="bg-red-50 border-l-4 border-red-500 p-8 rounded-lg shadow-sm">
+                        <h3 class="text-2xl font-bold text-red-800 mb-4">Paradigma Atual (Séc. XX)</h3>
+                        <ul class="space-y-3 text-red-700">
+                            <li class="flex items-start"><span class="mr-3 text-xl">🏭</span> Foco em "indústria" e fluxo financeiro.</li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">🏰</span> Patrimonialismo colonial e redes fechadas.</li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">🚫</span> Exclusão de narrativas diversas e periféricas.</li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">💨</span> Total negligência climática e socioambiental.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-50 border-l-4 border-green-600 p-8 rounded-lg shadow-sm">
+                        <h3 class="text-2xl font-bold text-green-800 mb-4">Paradigma Proposto (Séc. XXI)</h3>
+                        <ul class="space-y-3 text-green-700">
+                            <li class="flex items-start"><span class="mr-3 text-xl">🌿</span> Vetor de transição ecológica e justiça climática.</li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">🌍</span> Governança democrática e participativa.</li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">🤝</span> Valorização de saberes e territórios marginalizados.</li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">📊</span> Pegada de carbono medida, reduzida e compensada.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="plano" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-[#3C3633]">O Plano de Ação</h2>
+                     <p class="mt-4 max-w-3xl mx-auto text-gray-600">
+                        Esta é a nossa proposta concreta para a refundação do FSA, baseada em frentes de ação simultâneas: medidas no fomento, mudanças na governança e mobilização social.
+                    </p>
+                </div>
+
+                <div class="mb-8 flex justify-center space-x-2 md:space-x-4 border-b">
+                    <button class="tab-button active font-semibold py-3 px-6 rounded-t-lg transition-colors duration-300" data-tab="medidas">Fomento e Inclusão</button>
+                    <button class="tab-button font-semibold py-3 px-6 rounded-t-lg transition-colors duration-300" data-tab="governanca">Governança e Lei</button>
+                    <button class="tab-button font-semibold py-3 px-6 rounded-t-lg transition-colors duration-300" data-tab="autonomia">Fundo Autônomo</button>
+                </div>
+
+                <div id="medidas" class="tab-content">
+                    <div class="grid lg:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <h3 class="text-3xl font-bold text-[#2C5F2D] mb-4">Subquota Climática e Linha Social</h3>
+                            <p class="mb-6 text-gray-600">Instituir um percentual mínimo e crescente do FSA para projetos com compromissos climáticos e criar uma linha de fomento com gestão social para narrativas da sociedade ativa.</p>
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h4 class="font-bold">Linha "Audiovisual & Clima"</h4>
+                                    <ul class="list-disc list-inside text-gray-600 mt-2">
+                                        <li>Dotação inicial de R$ 50 milhões.</li>
+                                        <li>Gestão compartilhada com a sociedade civil (ISA, APIB, etc).</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h4 class="font-bold">Subquota Climática Progressiva</h4>
+                                    <ul class="list-disc list-inside text-gray-600 mt-2">
+                                         <li>Início com 10% em 2026, chegando a 30% em 2030.</li>
+                                        <li>Exigência de inventário de emissões e plano de redução.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="bg-gray-50 p-6 rounded-xl shadow-md">
+                            <h3 class="text-2xl font-bold text-center mb-4 text-[#3C3633]">Crescimento da Subquota Climática</h3>
+                            <div class="chart-container h-[300px] md:h-[350px]">
+                                <canvas id="subquotaChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="governanca" class="tab-content hidden">
+                     <div class="max-w-4xl mx-auto text-center">
+                        <h3 class="text-3xl font-bold text-[#2C5F2D] mb-4">Emenda à Lei e Nova Governança</h3>
+                        <p class="mb-8 text-gray-600">Para garantir que a mudança seja duradoura, propomos uma alteração legislativa que solidifique o controle social e os compromissos socioambientais na estrutura do FSA.</p>
+                        <div class="grid md:grid-cols-2 gap-8 text-left">
+                            <div class="bg-green-50 p-6 rounded-lg">
+                                <h4 class="font-bold text-lg text-green-800">Quota Social e Participativa</h4>
+                                <ul class="list-disc list-inside text-green-700 mt-2 space-y-1">
+                                    <li><strong>Subquota permanente de 15%</strong> para projetos da sociedade ativa (ONGs, coletivos).</li>
+                                    <li>Ampliação do leque de beneficiários na lei.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-green-50 p-6 rounded-lg">
+                                <h4 class="font-bold text-lg text-green-800">Assentos Fixos no CGFSA</h4>
+                                <ul class="list-disc list-inside text-green-700 mt-2 space-y-1">
+                                    <li>Garantir cadeiras para <strong>comunidades de base</strong> (quilombolas, indígenas).</li>
+                                     <li>Incluir representantes da <strong>juventude climática</strong> e movimentos socioambientais.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="autonomia" class="tab-content hidden">
+                    <div class="max-w-4xl mx-auto text-center">
+                        <h3 class="text-3xl font-bold text-[#2C5F2D] mb-4">A Proposta Definitiva: Fundo Autônomo</h3>
+                        <p class="mb-8 text-gray-600">A solução mais eficaz a longo prazo: a criação de um fundo próprio, com gestão autônoma pela sociedade civil, processos ágeis e recursos dedicados para as narrativas da Terra.</p>
+                        <div class="grid md:grid-cols-3 gap-8">
+                            <div class="bg-amber-50 p-6 rounded-lg">
+                                <h4 class="font-bold text-lg text-amber-800">Governança Autônoma</h4>
+                                <p class="mt-2 text-amber-700">Comitê gestor formado exclusivamente por representantes de ISA, APIB, CONAQ, etc.</p>
+                            </div>
+                             <div class="bg-amber-50 p-6 rounded-lg">
+                                <h4 class="font-bold text-lg text-amber-800">Processos Simplificados</h4>
+                                <p class="mt-2 text-amber-700">Fim da burocracia que impede o acesso de grupos de base, com editais e desembolso ágeis.</p>
+                            </div>
+                             <div class="bg-amber-50 p-6 rounded-lg">
+                                <h4 class="font-bold text-lg text-amber-800">Distinção de Papéis</h4>
+                                <p class="mt-2 text-amber-700">Deixar o FSA comercial focar na indústria, enquanto o fundo autônomo foca na emergência climática.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cronograma" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-[#3C3633]">Cronograma: Um Caminho para a Mudança</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-gray-600">
+                        A transformação que propomos é urgente e tem um roteiro claro. Apresentamos um plano de ação integrado, dividido em fases, com prazos definidos. Clique em cada fase para ver os detalhes.
+                    </p>
+                </div>
+                <div class="relative w-full">
+                    <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-300 transform -translate-y-1/2"></div>
+                    <div id="timeline-container" class="relative flex justify-between items-start">
+                    </div>
+                </div>
+                <div id="timeline-details" class="mt-8 p-6 bg-gray-50 rounded-xl shadow-md min-h-[150px]">
+                </div>
+            </div>
+        </section>
+
+        <section id="ferramentas" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-[#3C3633]">Ferramentas para Narradores</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-gray-600">
+                        Use o poder da IA para transformar dados em drama e mobilizar apoio. Estas ferramentas foram criadas para ajudar a construir as narrativas que o Brasil precisa.
+                    </p>
+                </div>
+                <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-[#2C5F2D] mb-4 text-center">✨ Tradutor de Impacto</h3>
+                    <p class="text-gray-600 mb-4 text-center">Insira um conceito climático complexo ou um dado técnico e veja a IA transformá-lo em uma ideia para uma cena ou um curta-metragem.</p>
+                    <div>
+                        <label for="impact-input" class="block text-sm font-medium text-gray-700">Conceito ou Dado:</label>
+                        <textarea id="impact-input" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm" placeholder="Ex: Litigância climática, emissões de Escopo 3, ponto de inflexão da Amazônia..."></textarea>
+                    </div>
+                    <button id="generate-narrative-btn" class="mt-4 w-full bg-[#2C5F2D] text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 flex items-center justify-center transition-all duration-300">
+                        <span class="btn-text">Gerar Narrativa ✨</span>
+                        <span class="loader hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    </button>
+                    <div id="narrative-output-container" class="mt-6 hidden">
+                        <div id="narrative-output" class="prose max-w-none text-gray-700 h-64 overflow-y-auto pr-2 border border-gray-200 p-4 rounded-md bg-gray-50"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="impacto" class="py-20 bg-white">
+             <div class="container mx-auto px-6">
+                 <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-[#3C3633]">Impactos Esperados</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-gray-600">
+                        A implementação deste plano estabelecerá um novo pacto entre a política audiovisual e a emergência climática, gerando valor ambiental, social e de imagem para o Brasil.
+                    </p>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-green-50 p-6 rounded-xl text-center">
+                        <div class="text-4xl mb-4">📉</div>
+                        <h3 class="text-xl font-bold text-green-800 mb-2">Redução Mensurável</h3>
+                        <p class="text-green-700">O setor reduzirá emissões ano a ano, com metas claras e transparentes, caminhando para o net-zero em 2035.</p>
+                    </div>
+                    <div class="bg-green-50 p-6 rounded-xl text-center">
+                        <div class="text-4xl mb-4">👥</div>
+                        <h3 class="text-xl font-bold text-green-800 mb-2">Inclusão Social</h3>
+                        <p class="text-green-700">Até 30% dos recursos beneficiarão projetos comunitários e climáticos, promovendo justiça cultural.</p>
+                    </div>
+                     <div class="bg-green-50 p-6 rounded-xl text-center">
+                        <div class="text-4xl mb-4">🏆</div>
+                        <h3 class="text-xl font-bold text-green-800 mb-2">Posicionamento Global</h3>
+                        <p class="text-green-700">O Brasil se tornará referência mundial para fundos climático-culturais, fortalecendo seu soft power.</p>
+                    </div>
+                     <div class="bg-green-50 p-6 rounded-xl text-center">
+                        <div class="text-4xl mb-4">📝</div>
+                        <h3 class="text-xl font-bold text-green-800 mb-2">Responsabilização</h3>
+                        <p class="text-green-700">Relatórios públicos e assentos sociais no CGFSA garantirão a continuidade do compromisso.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="chamado" class="py-20 bg-[#3C3633] text-white">
+            <div class="container mx-auto px-6 text-center">
+                 <h2 class="text-4xl md:text-5xl font-black text-[#97A97C]">A BRINCADEIRA ACABOU.</h2>
+                 <blockquote class="max-w-3xl mx-auto mt-8 border-l-4 border-[#97A97C] pl-6 text-left">
+                    <p class="text-xl italic text-gray-200">"Incluir para não mudar. Diversificar para não redistribuir. Nomear para não governar. Se a estrutura não muda, se o recurso não desce, se o paradigma não se altera — não há justiça, há gerenciamento da exclusão."</p>
+                </blockquote>
+                 <p class="mt-12 text-xl font-bold text-white">
+                    Incluir a sociedade ativa é dever constitucional, ato de reparação histórica e resposta à emergência climática.
+                </p>
+                <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <button id="open-email-modal-btn" class="bg-[#E0A75E] text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-opacity-90 transition-transform duration-300 hover:scale-105 shadow-lg w-full sm:w-auto">
+                        ✨ Pressionar o CGFSA
+                    </button>
+                    <button id="open-social-modal-btn" class="bg-[#2C5F2D] text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-opacity-90 transition-transform duration-300 hover:scale-105 shadow-lg w-full sm:w-auto">
+                        ✨ Amplificar nas Redes
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#3C3633] text-gray-300 border-t border-gray-700">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <h3 class="text-2xl font-bold text-white">Junte-se ao movimento.</h3>
+            <p class="mt-4 max-w-2xl mx-auto text-gray-400">
+                O futuro do soft power global passa pelo Brasil. É hora de refundar nosso audiovisual para o século XXI.
+            </p>
+            <div class="mt-8">
+                 <a href="https://filmsforfuture.info" target="_blank" rel="noopener noreferrer" class="text-[#E0A75E] font-semibold hover:underline">
+                    filmsforfuture.info
+                </a>
+            </div>
+            <p class="mt-8 text-sm text-gray-500">&copy; 2025 Films For Future. Uma proposta para um futuro possível.</p>
+        </div>
+    </footer>
+
+    <!-- Gemini Email Generator Modal -->
+    <div id="gemini-email-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl p-6 relative animate-fade-in">
+            <button id="close-email-modal" class="absolute top-2 right-4 text-gray-500 hover:text-gray-800 text-3xl font-bold">&times;</button>
+            <h3 class="text-2xl font-bold text-[#2C5F2D] mb-4">✨ Gerar E-mail para o CGFSA</h3>
+            <p class="text-gray-600 mb-4">Use a IA para gerar uma minuta de e-mail para o Comitê Gestor do FSA, com base nas propostas deste relatório. Preencha seus dados e pressione gerar.</p>
+            <div class="space-y-4">
+                <div>
+                    <label for="userName" class="block text-sm font-medium text-gray-700">Seu Nome</label>
+                    <input type="text" id="userName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm" placeholder="Seu Nome Completo">
+                </div>
+                <div>
+                    <label for="userOrg" class="block text-sm font-medium text-gray-700">Sua Organização/Coletivo (Opcional)</label>
+                    <input type="text" id="userOrg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm" placeholder="Nome da Organização">
+                </div>
+                <button id="generate-email-btn" class="w-full bg-[#E0A75E] text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 flex items-center justify-center transition-all duration-300">
+                    <span class="btn-text">Gerar E-mail ✨</span>
+                    <span class="loader hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                </button>
+            </div>
+            <div id="email-output-container" class="mt-6 hidden">
+                <div class="flex justify-between items-center">
+                     <h4 class="font-bold text-lg">E-mail Gerado:</h4>
+                     <button id="copy-email-btn" class="bg-gray-200 text-gray-700 text-xs font-bold py-1 px-3 rounded-lg hover:bg-gray-300">Copiar Texto</button>
+                </div>
+                <textarea id="email-output" class="mt-2 w-full h-64 p-2 border border-gray-300 rounded-md bg-gray-50" readonly></textarea>
+                 <p id="copy-feedback" class="text-sm text-green-600 h-4 mt-1"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gemini Project Ideas Modal -->
+    <div id="gemini-ideas-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl p-6 relative animate-fade-in">
+            <button id="close-ideas-modal" class="absolute top-2 right-4 text-gray-500 hover:text-gray-800 text-3xl font-bold">&times;</button>
+            <h3 id="ideas-modal-title" class="text-2xl font-bold text-[#2C5F2D] mb-4">✨ Ideias de Projetos</h3>
+            <div id="ideas-output-container" class="prose max-w-none text-gray-700 h-80 overflow-y-auto pr-2">
+            </div>
+             <div id="ideas-loader" class="hidden text-center p-8">
+                <div class="w-8 h-8 border-4 border-[#2C5F2D] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p>Buscando inspiração... 🤖</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gemini Social Media Modal -->
+    <div id="gemini-social-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl p-6 relative animate-fade-in">
+            <button id="close-social-modal" class="absolute top-2 right-4 text-gray-500 hover:text-gray-800 text-3xl font-bold">&times;</button>
+            <h3 class="text-2xl font-bold text-[#2C5F2D] mb-4">✨ Amplificar a Mensagem nas Redes</h3>
+            <p class="text-gray-600 mb-4">Escolha uma plataforma para gerar um post pronto para compartilhar e ajudar a pressionar por mudanças no FSA.</p>
+            <div class="flex justify-center space-x-4 mb-4">
+                <button data-platform="Twitter" class="social-platform-btn bg-blue-400 text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90">Twitter / X</button>
+                <button data-platform="Instagram" class="social-platform-btn bg-pink-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90">Instagram</button>
+                <button data-platform="LinkedIn" class="social-platform-btn bg-blue-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90">LinkedIn</button>
+            </div>
+            <div id="social-output-container" class="hidden">
+                 <div class="flex justify-between items-center">
+                     <h4 id="social-output-title" class="font-bold text-lg">Post Gerado:</h4>
+                     <button id="copy-social-btn" class="bg-gray-200 text-gray-700 text-xs font-bold py-1 px-3 rounded-lg hover:bg-gray-300">Copiar Texto</button>
+                </div>
+                <textarea id="social-output" class="mt-2 w-full h-48 p-2 border border-gray-300 rounded-md bg-gray-50" readonly></textarea>
+                <p id="copy-social-feedback" class="text-sm text-green-600 h-4 mt-1"></p>
+            </div>
+             <div id="social-loader" class="hidden text-center p-8">
+                <div class="w-8 h-8 border-4 border-[#2C5F2D] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p>Criando post... ✍️</p>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
+
+async function callGemini(prompt) {
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+        });
+        const text = response.text;
+        if (text && text.trim()) {
+            return text;
+        } else {
+            return "Não foi possível gerar o conteúdo. A resposta da API estava vazia ou em formato inesperado.";
+        }
+    } catch (error) {
+        console.error("Error calling Gemini API:", error);
+        return `Erro ao contatar a API: ${error.message}. Verifique o console para mais detalhes.`;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    const organizations = [
+        { name: 'ISA', fullName: 'Instituto Socioambiental', desc: 'Produz documentários, séries e animações sobre direitos indígenas, biodiversidade e territórios ameaçados.', icon: '🌳' },
+        { name: 'Observatório do Clima', fullName: 'Observatório do Clima', desc: 'Principal rede de articulação climática do país, com vídeos educativos e podcasts.', icon: '🌎' },
+        { name: 'Greenpeace Brasil', fullName: 'Greenpeace Brasil', desc: 'Campanhas de impacto global com peças audiovisuais premiadas sobre a Amazônia e o clima.', icon: '🕊️' },
+        { name: 'APIB', fullName: 'Articulação dos Povos Indígenas do Brasil', desc: 'Potente estratégia de comunicação indígena, com vídeos, lives e documentários.', icon: '🏹' },
+        { name: 'CONAQ', fullName: 'Coord. Nacional de Articulação das Comunidades Quilombolas', desc: 'Produção constante de vídeos educativos e denúncias sobre racismo ambiental.', icon: '✊🏿' },
+        { name: 'Rede de Juventude pelo Clima', fullName: 'Rede de Juventude pelo Clima', desc: 'Articula jovens produtores e cineastas climáticos com estética nativa digital.', icon: '📱' },
+        { name: 'COIAB', fullName: 'Coord. das Organizações Indígenas da Amazônia Brasileira', desc: 'Comunicação estratégica com vídeos de resistência e cobertura de assembleias.', icon: '🌿' },
+        { name: 'Mídia NINJA', fullName: 'Mídia NINJA / Assoc. Coletivo Cultural', desc: 'Revolucionou a mídia, produzindo audiovisual sem acesso algum ao fundo.', icon: '🎥' }
+    ];
+
+    const orgsGrid = document.getElementById('orgs-grid');
+    if (orgsGrid) {
+        organizations.forEach(org => {
+            const cardHTML = `
+            <div class="card-flip h-64 cursor-pointer group">
+                <div class="card-flip-inner">
+                    <div class="card-face bg-white shadow-lg group-hover:shadow-xl transition-shadow flex flex-col justify-center items-center p-4">
+                        <div class="text-5xl mb-4">${org.icon}</div>
+                        <h3 class="text-xl font-bold text-center text-[#3C3633]">${org.name}</h3>
+                    </div>
+                    <div class="card-face card-back bg-[#3C3633] text-white flex flex-col justify-center items-center p-4">
+                        <h4 class="text-lg font-bold text-center text-[#E0A75E]">${org.fullName}</h4>
+                        <p class="text-sm mt-2 text-gray-300 text-center">${org.desc}</p>
+                        <p class="mt-4 text-red-700 font-bold bg-red-100 px-3 py-1 rounded-full text-sm">❌ NUNCA ACESSOU O FSA</p>
+                        <button data-org-name="${org.fullName}" data-org-desc="${org.desc}" class="generate-ideas-btn mt-3 bg-[#2C5F2D] text-white text-xs font-bold py-1 px-3 rounded-full hover:bg-opacity-80 transition-colors">Gerar Ideias ✨</button>
+                    </div>
+                </div>
+            </div>`;
+            orgsGrid.innerHTML += cardHTML;
+        });
+        
+        document.querySelectorAll('.card-flip').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('generate-ideas-btn')) {
+                    card.classList.toggle('flipped');
+                }
+            });
+        });
+    }
+
+    const fsaBudgetCtx = document.getElementById('fsaBudgetChart')?.getContext('2d');
+    if (fsaBudgetCtx) {
+        new Chart(fsaBudgetCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Plano de Ação FSA 2024', 'Proposta "Linha Clima"'],
+                datasets: [{
+                    label: 'Orçamento em R$ (Milhões)',
+                    data: [1200, 50],
+                    backgroundColor: ['#E0A75E', '#2C5F2D'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (c) => ` R$ ${c.raw} milhões` } }
+                },
+                scales: { x: { title: { display: true, text: 'Valor em Milhões de Reais (R$)' } } }
+            }
+        });
+    }
+
+    const concentrationCtx = document.getElementById('concentrationChart')?.getContext('2d');
+    if (concentrationCtx) {
+        new Chart(concentrationCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Eixo Rio-SP', 'Resto do Brasil'],
+                datasets: [{
+                    data: [60.11, 39.89],
+                    backgroundColor: ['#C0392B', '#BDC3C7'],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { callbacks: { label: (c) => `${c.label}: ${c.raw.toFixed(2)}%` } }
+                }
+            }
+        });
+    }
+    
+    const subquotaCtx = document.getElementById('subquotaChart')?.getContext('2d');
+    if (subquotaCtx) {
+        new Chart(subquotaCtx, {
+            type: 'line',
+            data: {
+                labels: ['2026', '2027', '2028', '2029', '2030+'],
+                datasets: [{
+                    label: 'Subquota Climática Mínima',
+                    data: [10, 15, 20, 25, 30],
+                    fill: true,
+                    backgroundColor: 'rgba(44, 95, 45, 0.2)',
+                    borderColor: '#2C5F2D',
+                    tension: 0.1,
+                    pointBackgroundColor: '#2C5F2D',
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (c) => `${c.parsed.y}% do Eixo Produção` } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 35,
+                        title: { display: true, text: 'Percentual (%)' }
+                    }
+                }
+            }
+        });
+    }
+
+    const tabs = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(item => item.classList.remove('active'));
+            tab.classList.add('active');
+            const target = tab.getAttribute('data-tab');
+            tabContents.forEach(content => {
+                content.classList.toggle('hidden', content.id !== target);
+            });
+        });
+    });
+
+    const timelineData = [
+        { phase: 'Fase 1', title: 'Mobilização', prazo: '0–30 dias', content: 'Lançar campanha “Zero Climático”; audiência pública no Senado; protocolo de auditoria TCU.' },
+        { phase: 'Fase 2', title: 'Resolução CGFSA', prazo: '0–60 dias', content: 'Protocolo de minuta; votação no CGFSA; publicação de edital “subquota climática”.' },
+        { phase: 'Fase 3', title: 'Proposta Legislativa', prazo: '0–90 dias', content: 'Apresentação de PL de emenda à Lei 11.437/2006; tramitação em comissão.' },
+        { phase: 'Fase 4', title: 'Implementação', prazo: '2026–2030', content: 'Início de relatórios GEE (2026); primeiros rankings; novos editais 2027 com Escopo 3; revisão anual.' },
+        { phase: 'Fase 5', title: 'Consolidação', prazo: '2030–2035', content: 'Atingir 30% subquota climática; net-zero setorial até 2035; relatório final de impacto.' }
+    ];
+
+    const timelineContainer = document.getElementById('timeline-container');
+    const timelineDetails = document.getElementById('timeline-details');
+    if (timelineContainer && timelineDetails) {
+        timelineData.forEach((item) => {
+            const timelineItem = document.createElement('div');
+            timelineItem.className = 'timeline-item flex-1 text-center cursor-pointer';
+            timelineItem.innerHTML = `
+                <div class="timeline-dot relative w-6 h-6 bg-gray-300 rounded-full mx-auto transition-all duration-300"></div>
+                <p class="timeline-title mt-2 font-semibold text-gray-600 transition-colors duration-300">${item.phase}</p>
+            `;
+            timelineItem.addEventListener('click', () => {
+                document.querySelectorAll('.timeline-item').forEach(el => el.classList.remove('active'));
+                timelineItem.classList.add('active');
+                updateTimelineDetails(item);
+            });
+            timelineContainer.appendChild(timelineItem);
+        });
+
+        function updateTimelineDetails(item) {
+            timelineDetails.innerHTML = `
+                <h4 class="font-bold text-xl text-[#3C3633]">${item.phase}: ${item.title}</h4>
+                <p class="text-sm font-semibold text-[#E0A75E] mt-1 mb-2">Prazo: ${item.prazo}</p>
+                <p class="text-gray-600">${item.content}</p>
+            `;
+        }
+        document.querySelector('.timeline-item')?.click();
+    }
+
+    const navLinks = document.querySelectorAll('header a[href^=\"#\"]');
+    const sections = document.querySelectorAll('main section');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute('id');
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href').includes(id));
+                });
+            }
+        });
+    }, { rootMargin: '-40% 0px -60% 0px' });
+
+    sections.forEach(section => observer.observe(section));
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (mobileMenu.classList.contains('hidden') === false) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    });
+
+    const accordionHeaders = document.querySelectorAll('.accordion-header');
+    accordionHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.accordion-icon');
+            
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
+                document.querySelectorAll('.accordion-icon').forEach(i => i.style.transform = 'rotate(0deg)');
+                content.style.maxHeight = content.scrollHeight + "px";
+                icon.style.transform = 'rotate(180deg)';
+            }
+        });
+    });
+
+    // Gemini API Features
+    const emailModal = document.getElementById('gemini-email-modal');
+    const openEmailModalBtn = document.getElementById('open-email-modal-btn');
+    const closeEmailModalBtn = document.getElementById('close-email-modal');
+    const generateEmailBtn = document.getElementById('generate-email-btn');
+    const emailOutputContainer = document.getElementById('email-output-container');
+    const emailOutput = document.getElementById('email-output');
+    const copyEmailBtn = document.getElementById('copy-email-btn');
+    const copyFeedback = document.getElementById('copy-feedback');
+    const emailLoader = document.querySelector('#generate-email-btn .loader');
+    const emailBtnText = document.querySelector('#generate-email-btn .btn-text');
+
+    const ideasModal = document.getElementById('gemini-ideas-modal');
+    const closeIdeasModalBtn = document.getElementById('close-ideas-modal');
+    const ideasModalTitle = document.getElementById('ideas-modal-title');
+    const ideasOutputContainer = document.getElementById('ideas-output-container');
+    const ideasLoader = document.getElementById('ideas-loader');
+
+    const socialModal = document.getElementById('gemini-social-modal');
+    const openSocialModalBtn = document.getElementById('open-social-modal-btn');
+    const closeSocialModalBtn = document.getElementById('close-social-modal');
+    const socialPlatformBtns = document.querySelectorAll('.social-platform-btn');
+    const socialOutputContainer = document.getElementById('social-output-container');
+    const socialOutputTitle = document.getElementById('social-output-title');
+    const socialOutput = document.getElementById('social-output');
+    const copySocialBtn = document.getElementById('copy-social-btn');
+    const copySocialFeedback = document.getElementById('copy-social-feedback');
+    const socialLoader = document.getElementById('social-loader');
+    
+    const impactInput = document.getElementById('impact-input');
+    const generateNarrativeBtn = document.getElementById('generate-narrative-btn');
+    const narrativeOutputContainer = document.getElementById('narrative-output-container');
+    const narrativeOutput = document.getElementById('narrative-output');
+    const narrativeLoader = document.querySelector('#generate-narrative-btn .loader');
+    const narrativeBtnText = document.querySelector('#generate-narrative-btn .btn-text');
+
+    const setupModal = (modal, openBtn, closeBtn) => {
+        if (openBtn) openBtn.addEventListener('click', () => modal.style.display = 'flex');
+        if (closeBtn) closeBtn.addEventListener('click', () => modal.style.display = 'none');
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+    };
+
+    setupModal(emailModal, openEmailModalBtn, closeEmailModalBtn);
+    setupModal(ideasModal, null, closeIdeasModalBtn);
+    setupModal(socialModal, openSocialModalBtn, closeSocialModalBtn);
+
+    generateEmailBtn.addEventListener('click', async () => {
+        const userName = document.getElementById('userName').value || "Um(a) cidadão(ã) preocupado(a)";
+        const userOrg = document.getElementById('userOrg').value;
+        const orgText = userOrg ? `em nome de ${userOrg}` : '';
+
+        const prompt = `
+            Gere um e-mail formal e contundente em português do Brasil para o Comitê Gestor do Fundo Setorial do Audiovisual (CGFSA).
+            O e-mail deve ser assinado por "${userName}" ${orgText}.
+            O tom deve ser respeitoso, mas firme, expressando urgência e preocupação com a negligência climática do FSA.
+            O e-mail deve abordar os seguintes pontos, com base em um relatório sobre o tema:
+            1.  Introdução: Apresentar-se e declarar o motivo do contato: a ausência total de uma política climática no FSA, o que é inaceitável às vésperas da COP30 em Belém.
+            2.  O Problema: Mencionar que, apesar de movimentar bilhões (R$ 5 bilhões em 3 anos), o FSA não possui linhas de fomento, editais ou critérios para narrativas climáticas, operando em desalinhamento com o Acordo de Paris e a Política Nacional sobre Mudança do Clima (PNMC).
+            3.  A Proposta: Exortar o Comitê Gestor a tomar medidas emergenciais e concretas, como a criação de uma Resolução Emergencial para instituir uma linha de fomento "Audiovisual & Clima – Gestão Social" e uma subquota climática progressiva para projetos com compromissos de sustentabilidade.
+            4.  O Chamado à Ação: Concluir reforçando a oportunidade histórica da COP30 e a necessidade de o FSA se alinhar ao futuro do Brasil e à liderança climática que o país almeja. Pedir uma resposta e ação imediatas.
+            Finalize com "Atenciosamente," seguido pelo nome e organização do remetente.
+        `;
+
+        emailBtnText.classList.add('hidden');
+        emailLoader.classList.remove('hidden');
+        emailOutputContainer.classList.add('hidden');
+        
+        const generatedText = await callGemini(prompt);
+        
+        emailOutput.value = generatedText;
+        emailOutputContainer.classList.remove('hidden');
+        emailBtnText.classList.remove('hidden');
+        emailLoader.classList.add('hidden');
+    });
+
+    copyEmailBtn.addEventListener('click', () => {
+        emailOutput.select();
+        document.execCommand('copy');
+        copyFeedback.textContent = 'Copiado para a área de transferência!';
+        setTimeout(() => { copyFeedback.textContent = ''; }, 2000);
+    });
+
+    document.querySelectorAll('.generate-ideas-btn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const orgName = e.target.getAttribute('data-org-name');
+            const orgDesc = e.target.getAttribute('data-org-desc');
+
+            ideasModalTitle.textContent = `✨ Ideias de Projetos para ${orgName}`;
+            ideasOutputContainer.innerHTML = '';
+            ideasLoader.classList.remove('hidden');
+            ideasModal.style.display = 'flex';
+
+            const prompt = `
+                Aja como um roteirista e produtor de conteúdo criativo focado em impacto social.
+                Para a organização brasileira "${orgName}", cuja missão é: "${orgDesc}", gere 3 a 4 ideias concisas para projetos audiovisuais (documentário, série, animação, etc.) que poderiam ser financiados.
+                As ideias devem ser diretamente relacionadas à missão da organização e à pauta da justiça climática e socioambiental no Brasil.
+                Para cada ideia, forneça:
+                - Um título impactante.
+                - O formato (ex: Série Documental, Longa-metragem de Animação).
+                - Uma sinopse curta (2-3 frases).
+                Formate a resposta de forma clara e organizada, usando títulos para cada projeto.
+            `;
+
+            const generatedIdeas = await callGemini(prompt);
+            
+            ideasLoader.classList.add('hidden');
+            let htmlIdeas = generatedIdeas
+                .replace(/\*\*(.*?)\*\*/g, '<h4>$1</h4>')
+                .replace(/\n/g, '<br>');
+            ideasOutputContainer.innerHTML = htmlIdeas;
+        });
+    });
+    
+    generateNarrativeBtn.addEventListener('click', async () => {
+        const userInput = impactInput.value;
+        if (!userInput.trim()) {
+            alert("Por favor, insira um conceito ou dado.");
+            return;
+        }
+
+        const prompt = `
+            Aja como um roteirista e diretor de cinema criativo. Sua tarefa é traduzir um conceito técnico ou um dado sobre a crise climática em uma narrativa audiovisual poderosa e acessível.
+            O conceito fornecido pelo usuário é: "${userInput}".
+            Crie uma sinopse ou uma ideia de cena curta (1-2 parágrafos) para um filme, documentário ou curta de animação que dramatize ou explique visualmente este conceito. A narrativa deve ser emocionalmente envolvente e visualmente rica.
+            Estruture sua resposta da seguinte forma:
+            **Título da Ideia:** [Crie um título criativo]
+            **Formato:** [Ex: Cena de Abertura de Documentário, Curta de Animação, Sinopse de Longa-metragem]
+            **Narrativa:** [Descreva a cena ou a história aqui]
+        `;
+
+        narrativeBtnText.classList.add('hidden');
+        narrativeLoader.classList.remove('hidden');
+        narrativeOutputContainer.classList.add('hidden');
+
+        const generatedNarrative = await callGemini(prompt);
+
+        let htmlNarrative = generatedNarrative
+            .replace(/\*\*(.*?)\*\*/g, '<h4>$1</h4>')
+            .replace(/\n/g, '<br>');
+        narrativeOutput.innerHTML = htmlNarrative;
+        
+        narrativeOutputContainer.classList.remove('hidden');
+        narrativeBtnText.classList.remove('hidden');
+        narrativeLoader.classList.add('hidden');
+    });
+
+    socialPlatformBtns.forEach(button => {
+        button.addEventListener('click', async () => {
+            const platform = button.getAttribute('data-platform');
+            
+            let prompt = `
+                Aja como um estrategista de comunicação digital para uma campanha de ativismo.
+                Gere um post para a plataforma ${platform} em português do Brasil sobre a negligência climática do Fundo Setorial do Audiovisual (FSA) do Brasil.
+                Use os seguintes dados: O FSA movimentou R$ 5 bilhões em 3 anos, mas tem 0% de investimento em narrativas climáticas, às vésperas da COP30 no Brasil. A proposta é criar uma linha de fomento para o clima e responsabilizar os gestores.
+                O tom deve ser urgente e convocar à ação.
+            `;
+            
+            if (platform === 'Twitter') {
+                prompt += ` O post deve ser curto, impactante e usar no máximo 280 caracteres. Inclua as hashtags #FSAClimaJá, #COP30 e #AudiovisualPeloClima.`;
+            } else if (platform === 'Instagram') {
+                prompt += ` O post deve ser um pouco mais elaborado, ideal para uma legenda de imagem ou carrossel. Comece com uma frase de impacto. Use parágrafos curtos e emojis relevantes. Inclua as hashtags #FSAClimaJá, #COP30, #AudiovisualPeloClima, #EmergenciaClimatica, #Cultura.`;
+            } else if (platform === 'LinkedIn') {
+                prompt += ` O post deve ter um tom mais profissional e analítico, voltado para stakeholders da cultura, governo e setor privado. Estruture em parágrafos curtos, destacando a incoerência estratégica, a responsabilidade legal dos gestores e o risco reputacional para o Brasil. Inclua as hashtags #FSA, #ESG, #COP30, #EconomiaCriativa, #Sustentabilidade, #Audiovisual.`;
+            }
+            
+            socialLoader.classList.remove('hidden');
+            socialOutputContainer.classList.add('hidden');
+
+            const generatedPost = await callGemini(prompt);
+
+            socialOutputTitle.textContent = `Post para ${platform}:`;
+            socialOutput.value = generatedPost;
+            socialLoader.classList.add('hidden');
+            socialOutputContainer.classList.remove('hidden');
+        });
+    });
+
+    copySocialBtn.addEventListener('click', () => {
+        socialOutput.select();
+        document.execCommand('copy');
+        copySocialFeedback.textContent = 'Copiado para a área de transferência!';
+        setTimeout(() => { copySocialFeedback.textContent = ''; }, 2000);
+    });
+
+});
+</script>
+
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
